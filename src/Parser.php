@@ -13,9 +13,9 @@ class Parser
         }
 
         return [
-            'title'        => $this->getTitle($dom),
-            'price'        => $this->getPrice($dom),
-            'availability' => $this->getAvailability($dom),
+            'title'        => $this->clean($this->getTitle($dom)),
+            'price'        => $this->clean($this->getPrice($dom)),
+            'availability' => $this->clean($this->getAvailability($dom)),
         ];
     }
 
@@ -28,17 +28,9 @@ class Parser
     private function getPrice($dom): ?string
     {
         $el = $dom->find('span.product-price', 0);
-
-        if (!$el) {
-            return null;
-        }
-
-        return html_entity_decode(
-            trim($el->plaintext),
-            ENT_QUOTES | ENT_HTML5,
-            'UTF-8'
-        );
+        return $el ? trim($el->plaintext) : null;
     }
+
     private function getAvailability($dom): ?string
     {
         foreach ($dom->find('div.category-list') as $el) {
@@ -50,5 +42,18 @@ class Parser
         }
 
         return null;
+    }
+
+    private function clean(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        return html_entity_decode(
+            trim($value),
+            ENT_QUOTES | ENT_HTML5,
+            'UTF-8'
+        );
     }
 }
