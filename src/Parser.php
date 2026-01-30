@@ -13,15 +13,34 @@ class Parser
         }
 
         return [
-            'title' => $this->getText($dom, 'h1.product-title'),
-            'price' => $this->getText($dom, '.price'),
-            'availability' => $this->getText($dom, '.availability'),
+            'title'        => $this->getTitle($dom),
+            'price'        => $this->getPrice($dom),
+            'availability' => $this->getAvailability($dom),
         ];
     }
 
-    private function getText($dom, string $selector): ?string
+    private function getTitle($dom): ?string
     {
-        $el = $dom->find($selector, 0);
+        $el = $dom->find('h1.product-title', 0);
         return $el ? trim($el->plaintext) : null;
+    }
+
+    private function getPrice($dom): ?string
+    {
+        $el = $dom->find('span.product-price', 0);
+        return $el ? trim($el->plaintext) : null;
+    }
+
+    private function getAvailability($dom): ?string
+    {
+        foreach ($dom->find('div.category-list') as $el) {
+            $text = trim($el->plaintext);
+
+            if (str_starts_with($text, 'Διαθεσιμότητα:')) {
+                return trim(str_replace('Διαθεσιμότητα:', '', $text));
+            }
+        }
+
+        return null;
     }
 }
