@@ -28,9 +28,17 @@ class Parser
     private function getPrice($dom): ?string
     {
         $el = $dom->find('span.product-price', 0);
-        return $el ? trim($el->plaintext) : null;
-    }
 
+        if (!$el) {
+            return null;
+        }
+
+        return html_entity_decode(
+            trim($el->plaintext),
+            ENT_QUOTES | ENT_HTML5,
+            'UTF-8'
+        );
+    }
     private function getAvailability($dom): ?string
     {
         foreach ($dom->find('div.category-list') as $el) {
